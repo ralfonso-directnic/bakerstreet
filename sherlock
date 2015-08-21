@@ -71,7 +71,7 @@ class Sherlock(object):
         policy = msg.properties["policy"]
         self.routeMap[address] = ([target
                                    for (host, port, target), owner in routes
-                                   if target and target.upper().startswith("HTTP")],
+                                   if target],
                                   policy)
         self.updated = True
         self.lastChangeTime = time()
@@ -97,10 +97,13 @@ class Sherlock(object):
         for address, (routes, policy) in sorted(self.routeMap.items()):
             head.append("# %s -> (%s) %s" % (address, policy, "; ".join(sorted(routes))))
             urlObj = urlparse(address)
+            urlRoute = urlparse(routes[0])
+            #log.warning(urlparse(routes[0]))
+
             backend = "BE" + urlObj.path.replace("/", "_")
             fre = "FE" + urlObj.path.replace("/", "_")
             pred = "IS" + urlObj.path.replace("/", "_")
-            scheme  = urlObj.scheme or "http" 
+            scheme  = urlRoute.scheme or "http"
             frontends.append("\nfrontend %s" % (fre))
             port_num = 8000+abs(hash(address)) % (10 ** 3)
             frontends.append("  bind *:%s" % (port_num))
