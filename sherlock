@@ -111,6 +111,9 @@ class Sherlock(object):
             frontends.append("  use_backend %s" % (backend))
             
             backends.append("\nbackend %s" % backend)
+            backends.append("\nbalance roundrobin");
+            backends.append("  mode %s" % (scheme))
+            backends.append("\noption redispatch")
             for url in sorted(routes):
                 urlObj = urlparse(url)
                 host = urlObj.hostname
