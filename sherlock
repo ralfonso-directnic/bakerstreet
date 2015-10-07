@@ -27,7 +27,7 @@ log = logging.getLogger()
 confBase = """
 global
     daemon
-    maxconn 10000
+    maxconn 20000
 
 defaults
     mode http
@@ -119,7 +119,7 @@ class Sherlock(object):
                 host = urlObj.hostname
                 port = urlObj.port or 80
                 name = "%s_%s" % (host, port)
-                backends.append("    server %s %s:%s maxconn 4000" % (name, host, port))
+                backends.append("    server %s %s:%s maxconn 10000" % (name, host, port))
         return "\n".join(head + confBase + frontends + backends)
 
     def pokeHAProxy(self):
