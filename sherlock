@@ -94,6 +94,8 @@ class Sherlock(object):
         head = []
         frontends = []
         backends = []
+        loaded = {}
+
         for address, (routes, policy) in sorted(self.routeMap.items()):
             head.append("# %s -> (%s) %s" % (address, policy, "; ".join(sorted(routes))))
             urlObj = urlparse(address)
@@ -119,6 +121,9 @@ class Sherlock(object):
                 host = urlObj.hostname
                 port = urlObj.port or 80
                 name = "%s_%s" % (host, port)
+                if name in loaded:
+                        continue
+                loaded[name]=1
                 backends.append("    server %s %s:%s maxconn 10000" % (name, host, port))
         return "\n".join(head + confBase + frontends + backends)
 
