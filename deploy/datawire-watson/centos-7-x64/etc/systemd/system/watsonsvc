@@ -1,0 +1,74 @@
+#!/bin/bash
+# watsonsvc daemon
+# chkconfig: 345 20 80
+# description: watsonsvc daemon
+# processname: watsonsvc
+
+DAEMON_PATH="/usr/bin"
+
+DAEMON=watson
+
+NAME=watsonsvc
+DESC="Watson service"
+SCRIPTNAME=/etc/init.d/$NAME
+
+case "$1" in
+start)
+        printf "%-50s" "Starting $NAME..."
+        $0 stop
+        cd $DAEMON_PATH
+
+        FILES=/etc/datawire/watson/*.conf
+        for f in $FILES
+        do
+        echo "Processing $f ..."
+        # take action on each file. $f store current file name
+        /usr/bin/watson -c $f &
+        done
+        echo "ok";
+while true; do
+  sleep 1000
+done
+
+;;
+status)
+        printf "%-50s" "Checking $NAME..."
+        if [ -f $PIDFILE ]; then
+            PID=`cat $PIDFILE`
+            if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+                printf "%s\n" "Process dead but pidfile exists"
+            else
+                echo "Running"
+            fi
+        else
+            printf "%s\n" "Service not running"
+        fi
+;;
+stop)
+ killall watson
+ echo "Ok"
+;;
+
+restart)
+        printf "%-50s" "Starting $NAME..."
+        
+        cd $DAEMON_PATH
+
+        FILES=/etc/datawire/watson/*.conf
+        for f in $FILES
+        do
+        echo "Processing $f ..."
+        # take action on each file. $f store current file name
+        pkill -f $f
+        /usr/bin/watson -c $f &
+        done
+        echo "ok";
+while true; do
+  sleep 1000
+done
+;;
+
+*)
+        echo "Usage: $0 {status|start|stop|restart}"
+        exit 1
+esac
