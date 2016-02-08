@@ -1,0 +1,14 @@
+[Unit]
+Description=Watson Multi Start
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/watsonsvc start
+ExecStop=/usr/local/bin/watsonsvc stop
+ExecReload=/usr/local/bin/watsonsvc restart
+
+Restart=always
+RestartPreventExitStatus=78
+
+[Install]
+WantedBy=default.target
