@@ -53,6 +53,7 @@ restart)
         printf "%-50s" "Starting $NAME..."
         
         cd $DAEMON_PATH
+        killall watsonsvc
 
         FILES=/etc/datawire/watson/*.conf
         for f in $FILES
