@@ -3,11 +3,11 @@ Description=Watson Multi Start
 After=network.target
 
 [Service]
+Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/local/bin/watsonsvc start
-ExecStop=/usr/local/bin/watsonsvc stop
-ExecReload=/usr/local/bin/watsonsvc restart
 
-Restart=always
+Restart=no
 RestartPreventExitStatus=78
 
 [Install]
