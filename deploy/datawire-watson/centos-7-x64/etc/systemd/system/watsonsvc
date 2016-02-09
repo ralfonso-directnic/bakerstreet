@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # watsonsvc daemon
 # chkconfig: 345 20 80
 # description: watsonsvc daemon
@@ -6,7 +6,7 @@
 
 DAEMON_PATH="/usr/bin"
 
-DAEMON=watson
+DAEMON=watsonsvc
 
 NAME=watsonsvc
 DESC="Watson service"
@@ -15,7 +15,6 @@ SCRIPTNAME=/etc/init.d/$NAME
 case "$1" in
 start)
         printf "%-50s" "Starting $NAME..."
-        $0 stop
         cd $DAEMON_PATH
 
         FILES=/etc/datawire/watson/*.conf
@@ -23,53 +22,45 @@ start)
         do
         echo "Processing $f ..."
         # take action on each file. $f store current file name
+        /usr/bin/pkill -f $f
         /usr/bin/watson -c $f &
         done
         echo "ok";
-while true; do
-  sleep 1000
-done
-
+        exit 0
 ;;
 status)
-        printf "%-50s" "Checking $NAME..."
-        if [ -f $PIDFILE ]; then
-            PID=`cat $PIDFILE`
-            if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
-                printf "%s\n" "Process dead but pidfile exists"
-            else
-                echo "Running"
-            fi
-        else
-            printf "%s\n" "Service not running"
-        fi
+
+CT=$(ps aux | grep watson | wc -l)
+
+if [ $CT -gt "2" ]; then 
+  echo "ok - $CT processes"
+fi
+
 ;;
 stop)
- killall watson
+ #killall watson
  echo "Ok"
 ;;
 
-restart)
+reload)
         printf "%-50s" "Starting $NAME..."
         
         cd $DAEMON_PATH
-        killall watsonsvc
-
         FILES=/etc/datawire/watson/*.conf
         for f in $FILES
         do
         echo "Processing $f ..."
         # take action on each file. $f store current file name
-        pkill -f $f
+        echo "Stopping $f"
+        /usr/bin/pkill -f $f
+        echo "Starting watson $f" 
         /usr/bin/watson -c $f &
+        sleep 1
         done
-        echo "ok";
-while true; do
-  sleep 1000
-done
+        exit 0
 ;;
 
 *)
-        echo "Usage: $0 {status|start|stop|restart}"
+        echo "Usage: $0 {status|start|stop|restart|reload}"
         exit 1
 esac
